@@ -123,9 +123,14 @@ func parseExpression(tokens []*token, initialCursor uint, delimiters []token) (*
 		tokenFromKeyword(orKeyword),
 		tokenFromSymbol(eqSymbol),
 		tokenFromSymbol(neqSymbol),
-		// TODO add neqSymbol2
+		tokenFromSymbol(neqSymbol2),
+		tokenFromSymbol(gtSymbol),
+		tokenFromSymbol(gteSymbol),
+		tokenFromSymbol(ltSymbol),
+		tokenFromSymbol(lteSymbol),
 		tokenFromSymbol(concatSymbol),
 		tokenFromSymbol(plusSymbol),
+		tokenFromSymbol(minusSymbol),
 	}
 
 	binExp := binaryExpression{

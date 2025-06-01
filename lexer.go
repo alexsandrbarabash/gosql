@@ -27,8 +27,8 @@ const (
 	whereKeyword  keyword = "where"
 	andKeyword    keyword = "and"
 	orKeyword     keyword = "or"
-	trueKeyword   keyword = "true"
-	falseKeyword  keyword = "false"
+	// trueKeyword   keyword = "true"
+	// falseKeyword  keyword = "false"
 )
 
 type symbol string
@@ -47,8 +47,8 @@ const (
 	gteSymbol        symbol = ">="
 	concatSymbol     symbol = "||"
 	plusSymbol       symbol = "+"
-	// TODO add work with asterisk
-	asteriskSymbol symbol = "*"
+	minusSymbol      symbol = "-"
+	asteriskSymbol   symbol = "*"
 )
 
 type tokenKind uint
@@ -282,6 +282,7 @@ func lexSymbol(source string, ic cursor) (*token, cursor, bool) {
 		gtSymbol,
 		gteSymbol,
 		plusSymbol,
+		minusSymbol,
 		concatSymbol,
 		asteriskSymbol,
 	}
@@ -317,6 +318,8 @@ func lexKeyword(source string, ic cursor) (*token, cursor, bool) {
 		tableKeyword,
 		createKeyword,
 		whereKeyword,
+		orKeyword,
+		andKeyword,
 		fromKeyword,
 		intoKeyword,
 		textKeyword,
