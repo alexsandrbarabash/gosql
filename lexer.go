@@ -23,16 +23,32 @@ const (
 	valuesKeyword keyword = "values"
 	intKeyword    keyword = "int"
 	textKeyword   keyword = "text"
+	boolKeyword   keyword = "boolean"
+	whereKeyword  keyword = "where"
+	andKeyword    keyword = "and"
+	orKeyword     keyword = "or"
+	trueKeyword   keyword = "true"
+	falseKeyword  keyword = "false"
 )
 
 type symbol string
 
 const (
 	semicolonSymbol  symbol = ";"
-	asteriskSymbol   symbol = "*"
 	commaSymbol      symbol = ","
 	leftParenSymbol  symbol = "("
 	rightParenSymbol symbol = ")"
+	eqSymbol         symbol = "="
+	neqSymbol        symbol = "<>"
+	neqSymbol2       symbol = "!="
+	ltSymbol         symbol = "<"
+	lteSymbol        symbol = "<="
+	gtSymbol         symbol = ">"
+	gteSymbol        symbol = ">="
+	concatSymbol     symbol = "||"
+	plusSymbol       symbol = "+"
+	// TODO add work with asterisk
+	asteriskSymbol symbol = "*"
 )
 
 type tokenKind uint
@@ -43,6 +59,7 @@ const (
 	identifierKind
 	stringKind
 	numericKind
+	boolKind
 )
 
 type token struct {
@@ -70,7 +87,6 @@ func longestMatch(source string, ic cursor, options []string) string {
 	cur := ic
 
 	for cur.pointer < uint(len(source)) {
-
 		value = append(value, strings.ToLower(string(source[cur.pointer]))...)
 		cur.pointer++
 
@@ -88,7 +104,6 @@ func longestMatch(source string, ic cursor, options []string) string {
 				if len(option) > len(match) {
 					match = option
 				}
-
 				continue
 			}
 
@@ -245,12 +260,29 @@ func lexSymbol(source string, ic cursor) (*token, cursor, bool) {
 		return nil, cur, true
 	}
 
+	// Arrow exception
+	if ic.pointer+1 < uint(len(source)) {
+		arrowSymbol := source[ic.pointer : ic.pointer+2]
+		if arrowSymbol == "=>" {
+			return nil, ic, false
+		}
+	}
+
 	// Syntax that should be kept
 	symbols := []symbol{
 		commaSymbol,
 		leftParenSymbol,
 		rightParenSymbol,
 		semicolonSymbol,
+		eqSymbol,
+		neqSymbol,
+		neqSymbol2,
+		ltSymbol,
+		lteSymbol,
+		gtSymbol,
+		gteSymbol,
+		plusSymbol,
+		concatSymbol,
 		asteriskSymbol,
 	}
 
@@ -284,7 +316,7 @@ func lexKeyword(source string, ic cursor) (*token, cursor, bool) {
 		valuesKeyword,
 		tableKeyword,
 		createKeyword,
-		// whereKeyword,
+		whereKeyword,
 		fromKeyword,
 		intoKeyword,
 		textKeyword,

@@ -149,8 +149,56 @@ func TestTokenLexSymbol(t *testing.T) {
 			symbol: true,
 			value:  ")",
 		},
+		{
+			symbol: true,
+			value:  "=",
+		},
+		{
+			symbol: true,
+			value:  "<>",
+		},
+		{
+			symbol: true,
+			value:  "<=",
+		},
+		{
+			symbol: true,
+			value:  ">=",
+		},
+		{
+			symbol: true,
+			value:  "<>",
+		},
+		{
+			symbol: true,
+			value:  "<",
+		},
+		{
+			symbol: true,
+			value:  ">",
+		},
+		{
+			symbol: false,
+			value:  "=>",
+		},
+		{
+			symbol: true,
+			value:  " ",
+		},
+		{
+			symbol: false,
+			value:  "->",
+		},
+		{
+			symbol: true,
+			value:  "+",
+		},
+		{
+			symbol: true,
+			value:  "||",
+		},
+		// TODO add here "*""
 	}
-
 	for _, tt := range tests {
 		_, _, result := lexSymbol(tt.value, cursor{})
 
@@ -577,6 +625,16 @@ func TestLex(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "WHERE",
+			Tokens: []token{
+				{
+					loc:   location{col: 0, line: 0},
+					value: "where",
+					kind:  keywordKind,
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -587,5 +645,78 @@ func TestLex(t *testing.T) {
 		for i, tok := range tokens {
 			assert.Equal(t, &test.Tokens[i], tok, test.input)
 		}
+	}
+}
+
+func TestLongestMatch(t *testing.T) {
+	tests := []struct {
+		name     string
+		source   string
+		options  []string
+		expected string
+	}{
+		{
+			name:     "exact match",
+			source:   "select",
+			options:  []string{"select", "from", "where"},
+			expected: "select",
+		},
+		{
+			name:     "case insensitive match",
+			source:   "SELECT",
+			options:  []string{"select", "from", "where"},
+			expected: "select",
+		},
+		{
+			name:     "partial match",
+			source:   "sel",
+			options:  []string{"select", "from", "where"},
+			expected: "",
+		},
+		{
+			name:     "no match",
+			source:   "xyz",
+			options:  []string{"select", "from", "where"},
+			expected: "",
+		},
+		{
+			name:     "longest match wins",
+			source:   "int",
+			options:  []string{"int", "into"},
+			expected: "int",
+		},
+		{
+			name:     "empty source",
+			source:   "",
+			options:  []string{"select", "from", "where"},
+			expected: "",
+		},
+		{
+			name:     "empty options",
+			source:   "select",
+			options:  []string{},
+			expected: "",
+		},
+		{
+			name:     "multiple matches",
+			source:   "sel",
+			options:  []string{"sel", "select", "selenium"},
+			expected: "sel",
+		},
+		{
+			name:     "into",
+			source:   "into",
+			options:  []string{"int", "into"},
+			expected: "into",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := longestMatch(tt.source, cursor{}, tt.options)
+			if result != tt.expected {
+				t.Errorf("longestMatch() = %v, want %v", result, tt.expected)
+			}
+		})
 	}
 }
